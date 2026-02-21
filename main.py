@@ -47,7 +47,7 @@ def orb_strategy_with_stop_loss(df, k_upper, k_lower, sl_pct=0.005, tp_pct=0.01,
     minute_counts = df['count'].values
 
     for i in range(1, len(df)):
-        #每日尾盤強平 (23:00)
+        #每日尾盤強平(23:00)
         if times[i] >= pd.to_datetime('23:00:00').time():
             curr_pos = 0
             entry_price = 0
@@ -82,7 +82,7 @@ def orb_strategy_with_stop_loss(df, k_upper, k_lower, sl_pct=0.005, tp_pct=0.01,
     
     # 計算 Sharpe & MDD
     ann_factor = np.sqrt(252 * 1440)
-    sharpe = (df['strat_ret'].mean() / df['strat_ret'].std()) * ann_factor if df['strat_ret'].std() != 0 else 0
+    sharpe = (df['strat_ret'].mean() / df['strat_ret'].std()) * ann_factor 
     cum_ret = (1 + df['strat_ret']).cumprod()
     mdd = ((cum_ret.cummax() - cum_ret) / cum_ret.cummax()).max()
     
@@ -91,7 +91,7 @@ def orb_strategy_with_stop_loss(df, k_upper, k_lower, sl_pct=0.005, tp_pct=0.01,
 class GoldBayesianOptimizer:
     def __init__(self, df):
         self.df = df
-        self.bounds = np.array([[0.1, 3.0], [0.1, 3.0]]) # K值的搜尋範圍
+        self.bounds = np.array([[0.1, 3.0], [0.1, 3.0]]) #K值的搜尋範圍
         
     def expected_improvement(self, X, X_sample, Y_sample, gpr, xi=0.01):
         mu, sigma = gpr.predict(X, return_std=True)
@@ -104,11 +104,11 @@ class GoldBayesianOptimizer:
         return ei
 
     def optimize(self, train_data, n_iters=25):
-        # 初始點
+        #初始點
         X_sample = np.random.uniform(self.bounds[:, 0], self.bounds[:, 1], size=(8, 2))
         Y_sample = np.array([self.get_score(p, train_data) for p in X_sample])
         
-        # 高斯過程模型
+        #高斯過程模型
         kernel = C(1.0) * RBF(length_scale=[1.0, 1.0])
         gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5)
         
